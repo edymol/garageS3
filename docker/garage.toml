@@ -1,0 +1,28 @@
+# Garage config for the local `docker compose up` demo ONLY.
+# These tokens/secrets are throwaway values for a single-node localhost
+# cluster — DO NOT reuse them in production.
+
+metadata_dir = "/var/lib/garage/meta"
+data_dir = "/var/lib/garage/data"
+db_engine = "sqlite"
+
+replication_factor = 1
+
+rpc_bind_addr = "[::]:3901"
+# Advertised over the compose network so the init container can reach this node.
+rpc_public_addr = "garage:3901"
+rpc_secret = "5b5a2e2c1d9f4a3b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b"
+
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "[::]:3900"
+root_domain = ".s3.garage.localhost"
+
+[s3_web]
+bind_addr = "[::]:3902"
+root_domain = ".web.garage.localhost"
+index = "index.html"
+
+[admin]
+api_bind_addr = "[::]:3903"
+admin_token = "demo-admin-token"

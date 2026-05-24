@@ -21,6 +21,18 @@ Garage is an open-source, S3-compatible distributed object storage system design
 
 ![Garage UI dashboard](docs/dashboard.png)
 
+## Try it in one command (demo)
+
+Want to see it working *without* setting up Garage first? This repo ships a Docker Compose demo that starts a single-node Garage cluster **and** the UI, fully wired — it applies the cluster layout and creates a demo S3 key + bucket for you:
+
+```bash
+docker compose up --build
+```
+
+Then open **http://localhost:3000** — the dashboard loads with a ready-to-use bucket and key. Stop with `docker compose down` (add `-v` to also wipe the demo's data).
+
+> The demo uses throwaway credentials on a localhost-only cluster — it's for trying the UI, **not** production. For a real deployment, point the UI at your own Garage cluster using the [Quick Start](#quick-start) below.
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 18+ (22+ recommended)
