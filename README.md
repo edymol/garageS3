@@ -19,7 +19,7 @@ Garage is an open-source, S3-compatible distributed object storage system design
 
 ## Screenshots
 
-<!-- Add screenshots here -->
+![Garage UI dashboard](docs/dashboard.png)
 
 ## Prerequisites
 
@@ -49,6 +49,16 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+> **First run — two things must be true for the dashboard to load:**
+> 1. Garage's **Admin API is enabled and reachable** — a `[admin]` block with `admin_token` in `garage.toml`, and `GARAGE_ADMIN_URL` pointing at it (mind Docker/`localhost` and firewalls).
+> 2. The **cluster layout is applied** — a brand-new node has `NO ROLE ASSIGNED`, and the API returns `Layout not ready` until you run:
+>    ```bash
+>    garage layout assign -z <zone> -c <capacity> <node-id>   # e.g. -z dc1 -c 1G
+>    garage layout apply --version 1
+>    ```
+>
+> If the dashboard is stuck on **"Loading…"** or shows a connection error, follow **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** — it walks through the fix in a few steps.
 
 ## Configuration
 
