@@ -1,0 +1,67 @@
+# One-command demo: a single-node Garage cluster + Garage UI, fully wired.
+#
+#   docker compose up --build
+#   -> open http://localhost:3000
+#
+# This is a LOCAL DEMO. The tokens/keys below are throwaway values for a
+# localhost-only cluster — never use them in production. For a real
+# deployment, point the UI at your own Garage cluster (see README).
+
+name: garage-ui-demo
+
+services:
+  # Single-node Garage object storage.
+  garage:
+    image: dxflrs/garage:v2.2.0
+    volumes:
+      - ./docker/garage.toml:/etc/garage.toml:ro
+      - garage_meta:/var/lib/garage/meta
+      - garage_data:/var/lib/garage/data
+    ports:
+      - "3900:3900"   # S3 API
+      - "3903:3903"   # Admin API
+    healthcheck:
+      test: ["CMD", "/garage", "-c", "/etc/garage.toml", "status"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  # One-shot setup: apply the cluster layout, import a demo S3 key, make a bucket.
+  garage-init:
+    build:
+      context: .
+      dockerfile: docker/init.Dockerfile
+    depends_on:
+      garage:
+        condition: service_healthy
+    volumes:
+      - ./docker/garage.toml:/etc/garage.toml:ro
+      # Share Garage's metadata so the CLI can read the node key (needed for RPC auth).
+      - garage_meta:/var/lib/garage/meta
+    environment:
+      ACCESS_KEY: "GK00000000000000000000beef"
+      SECRET_KEY: "1111111111111111111111111111111111111111111111111111111111111111"
+      BUCKET: "photos"
+    restart: "no"
+
+  # The Garage UI web app.
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      garage-init:
+        condition: service_completed_successfully
+    environment:
+      GARAGE_ADMIN_URL: "http://garage:3903"
+      GARAGE_ADMIN_TOKEN: "demo-admin-token"
+      GARAGE_S3_ENDPOINT: "http://garage:3900"
+      GARAGE_S3_ACCESS_KEY: "GK00000000000000000000beef"
+      GARAGE_S3_SECRET_KEY: "1111111111111111111111111111111111111111111111111111111111111111"
+      GARAGE_S3_REGION: "garage"
+    ports:
+      - "3000:3000"
+
+volumes:
+  garage_meta:
+  garage_data:
